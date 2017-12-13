@@ -31,10 +31,7 @@ function draw()
     context.clearRect(0,0, canvas.width, canvas.height);
 
     // Draw the map
-    game.buildMap();
-
-
-
+    game.gameLoop();
 
     context.restore();
 
@@ -68,6 +65,12 @@ function checkArrowKeysUp(e){
     arrs[38]= 'up';
     arrs[39]= 'right';
     arrs[40]= 'down';
+    arrs[13]= 'enter';
+    arrs[27]= 'escape';
+    arrs[49]= '1';
+    arrs[50]= '2';
+    arrs[51]= '3';
+    arrs[52]= '4';
 
     if(arrs[key] == 'up') {
         game.moveCursorY(0);
@@ -80,5 +83,23 @@ function checkArrowKeysUp(e){
     }
     if(arrs[key] == 'right') {
         game.moveCursorX(1);
+    }
+    if(arrs[key] == 'enter') {
+        game.actionOnTile();
+    }
+    if(arrs[key] == 'escape') {
+        game.endOfTurn();
+    }
+    if(arrs[key] == '1') {
+        game.buy(0);
+    }
+    if(arrs[key] == '2') {
+        game.buy(1);
+    }
+    if(arrs[key] == '3') {
+        game.buy(2);
+    }
+    if(arrs[key] == '4') {
+        game.buy(3);
     }
 }

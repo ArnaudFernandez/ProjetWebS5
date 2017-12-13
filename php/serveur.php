@@ -14,5 +14,4 @@ if(isset($_GET["q"]))
 
     echo($mapContent);
 }
-
 ?>

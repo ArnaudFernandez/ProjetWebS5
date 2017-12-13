@@ -12,6 +12,7 @@ class Unite
         switch(idType)
         {
             case 0:
+                this.name = "Infantrie";
                 this.hp = 20;
                 this.power = 5;
                 this.cost = 10;
@@ -19,6 +20,7 @@ class Unite
                 this.attackRange = 1;
                 break;
             case 1:
+                this.name = "Sniper";
                 this.hp = 10;
                 this.power = 10;
                 this.cost = 10;
@@ -26,6 +28,7 @@ class Unite
                 this.attackRange = 4;
                 break;
             case 2:
+                this.name = "Jeep d'attaque";
                 this.hp = 50;
                 this.power = 15;
                 this.cost = 50;
@@ -33,6 +36,7 @@ class Unite
                 this.attackRange = 1;
                 break;
             case 3:
+                this.name = "Tank";
                 this.hp = 130;
                 this.power = 30;
                 this.cost = 100;
@@ -40,6 +44,7 @@ class Unite
                 this.attackRange = 1;
                 break;
             default:
+                this.name = "Default";
                 this.hp = 0;
                 this.power = 0;
                 this.cost = 0;
@@ -49,6 +54,11 @@ class Unite
         }
         this.posX = posX;
         this.posY = posY;
+    }
+
+    getName()
+    {
+        return this.name;
     }
 
     getHp()
