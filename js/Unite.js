@@ -91,6 +91,16 @@ class Unite
         this.hp -= damage;
     }
 
+    getX()
+    {
+        return this.posX;
+    }
+
+    getY()
+    {
+        return this.posY;
+    }
+
     isItAlive()
     {
         if(this.hp <= 0)

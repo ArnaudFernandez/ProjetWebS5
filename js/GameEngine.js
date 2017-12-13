@@ -58,6 +58,7 @@ class GameEngine
                 this.turnForPlayer(this.player1);
             }
 
+            // If menu is open, show menu for current player
             if(this.baseMenuOpen == true)
             {
                 if(this.playerTurn == 1)
@@ -65,6 +66,10 @@ class GameEngine
                 if(this.playerTurn == 2)
                     this.buildBaseActionMenu(this.player2);
             }
+
+            // Now we draw existings units
+            this.drawUnits()
+
 
         }
     }
@@ -230,6 +235,47 @@ class GameEngine
         context.restore();
     }
 
+    drawUnits()
+    {
+        if(this.player1 != null) {
+            for (let i = 0; i < this.player1.getUnites().length; i++) {
+                let x = this.player1.getUnites()[i].getX();
+                let y = this.player1.getUnites()[i].getY();
+
+                context.save();
+
+                context.fillStyle = "rgb(255, 0, 0)";
+                context.fillRect(this.tileSize * x + 25/2, this.tileSize * y + 25/2, this.tileSize - 25, this.tileSize - 25);
+
+                context.fillStyle = "rgba(0,0,0,0.8)";
+                context.font = "13px roboto";
+                context.fillText( "Pv : " + this.player1.getUnites()[i].getHp(), this.tileSize * x, this.tileSize * y + this.tileSize);
+
+                context.restore();
+
+            }
+        }
+        if(this.player2 != null) {
+            for (let i = 0; i < this.player2.getUnites().length; i++) {
+                let x = this.player2.getUnites()[i].getX();
+                let y = this.player2.getUnites()[i].getY();
+
+                context.save();
+
+                context.fillStyle = "rgb(0, 255, 0)";
+                context.fillRect(this.tileSize * x + 25/2, this.tileSize * y + 25/2, this.tileSize - 25, this.tileSize - 25);
+
+                context.fillStyle = "rgba(0,0,0,0.8)";
+                context.font = "13px roboto";
+                context.fillText( "Pv : " + this.player2.getUnites()[i].getHp(), this.tileSize * x, this.tileSize * y + this.tileSize);
+
+                context.restore();
+
+            }
+        }
+    }
+
+
     fillRandomMapForTest(map)
     {
         for(let i = 0; i < map.length; i++)
@@ -306,10 +352,9 @@ class GameEngine
         context.fillStyle = "rgba(0,0,0, 0.5)";
         context.fillRect(0, 0, canvas.width, canvas.height);
 
+        context.fillStyle = "rgba(0,0,0,1)";
         context.font = "30px roboto";
         context.fillText("Money : " + player.getMoney(), canvas.width / 2 + 1, canvas.height / 6);
-
-        console.log(this.unitesAvaliable.getUnites().length);
 
         for(let i = 0; i < this.unitesAvaliable.getUnites().length; i++)
         {
@@ -320,17 +365,56 @@ class GameEngine
         context.restore();
     }
 
+    isTileOccupied(posX, posY)
+    {
+        for(let i = 0; i < this.player1.getUnites().length; i++)
+        {
+            let x = this.player1.getUnites()[i].getX();
+            let y = this.player1.getUnites()[i].getY();
+
+            if(posX == x && posY == y)
+            {
+                return true;
+            }
+        }
+
+        for(let i = 0; i < this.player2.getUnites().length; i++)
+        {
+            let x = this.player2.getUnites()[i].getX();
+            let y = this.player2.getUnites()[i].getY();
+
+            if(posX == x && posY == y)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     buy(uniteId)
     {
         if(this.baseMenuOpen)
         {
             if(this.playerTurn == 1)
             {
-                this.player1.addUnite(uniteId, this.player1.getBase().getX(), this.player1.getBase().getY());
+                if(this.isTileOccupied(this.player1.getBase().getX(), this.player1.getBase().getY()))
+                {
+                    console.log("Tile is occupied : Buy canceled");
+                }
+                else {
+                    this.player1.addUnite(uniteId, this.player1.getBase().getX(), this.player1.getBase().getY());
+                }
             }
             if(this.playerTurn == 2)
             {
-                this.player2.addUnite(uniteId, this.player2.getBase().getX(), this.player2.getBase().getY());
+                if(this.isTileOccupied(this.player2.getBase().getX(), this.player2.getBase().getY()))
+                {
+                    console.log("Tile is occupied : Buy canceled");
+                }
+                else {
+                    this.player2.addUnite(uniteId, this.player2.getBase().getX(), this.player2.getBase().getY());
+                }
             }
 
             this.baseMenuOpen = false;
