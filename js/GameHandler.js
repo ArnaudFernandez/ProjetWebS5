@@ -88,7 +88,7 @@ function checkArrowKeysUp(e){
         game.actionOnTile();
     }
     if(arrs[key] == 'escape') {
-        game.endOfTurn();
+        game.escapePressed();
     }
     if(arrs[key] == '1') {
         game.buy(0);

@@ -22,6 +22,7 @@ class GameEngine
         this.playerCreated = false;
         this.playerTurn = 1;
         this.baseMenuOpen = false;
+        this.isUnitSelected = false;
         this.unitesAvaliable = new PoolUnite();
     }
 
@@ -79,9 +80,9 @@ class GameEngine
 
     }
 
-    endOfTurn()
+    escapePressed()
     {
-        // Si le menu est fermée, c'est que le joueur veut terminer son tours
+        // Si le menu est fermée, c'est que le joueur veut terminer son tour
         if(!this.baseMenuOpen) {
             if (this.playerTurn == 1) {
                 this.playerTurn = 2;
@@ -94,6 +95,13 @@ class GameEngine
             }
             console.log("Player turn : " + this.playerTurn);
         }
+        // Ou alors qu'il veut désélectionné une unité sélectionné
+        if(this.isUnitSelected == true)
+        {
+            this.isUnitSelected = false;
+            console.log("Unité désélectionné")
+        }
+
         // Sinon c'est juste qu'il veut fermer le menu
         else
         {
@@ -103,16 +111,90 @@ class GameEngine
         this.baseMenuOpen = false;
     }
 
+    isUnitOn()
+    {
+        if(this.playerTurn == 1) {
+            for (let i = 0; i < this.player1.getUnites().length; i++) {
+                let x = this.player1.getUnites()[i].getX();
+                let y = this.player1.getUnites()[i].getY();
+
+                if (this.cursorPosX == x && this.cursorPosY == y) {
+                    return true;
+                }
+            }
+        }
+
+        if(this.playerTurn == 2) {
+            for (let i = 0; i < this.player2.getUnites().length; i++) {
+                let x = this.player2.getUnites()[i].getX();
+                let y = this.player2.getUnites()[i].getY();
+
+                if (this.cursorPosX == x && this.cursorPosY == y) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    unitSelected()
+    {
+        let unitSelected = null;
+
+        if(this.playerTurn == 1) {
+            for (let i = 0; i < this.player1.getUnites().length; i++) {
+                let x = this.player1.getUnites()[i].getX();
+                let y = this.player1.getUnites()[i].getY();
+
+                if (this.cursorPosX == x && this.cursorPosY == y) {
+                    unitSelected = this.player1.getUnites()[i];
+                }
+            }
+        }
+
+        if(this.playerTurn == 2) {
+            for (let i = 0; i < this.player2.getUnites().length; i++) {
+                let x = this.player2.getUnites()[i].getX();
+                let y = this.player2.getUnites()[i].getY();
+
+                if (this.cursorPosX == x && this.cursorPosY == y) {
+                    unitSelected = this.player2.getUnites()[i];
+                }
+            }
+        }
+
+        if(unitSelected != null)
+        {
+            /* TODO : Show range while the unit is selected. Move is clicked on tile that is on range
+               Attack is performed if clicked on a ennemy that is in range
+            */
+
+            this.isUnitSelected = true;
+            console.log("Unité sélectionné");
+        }
+    }
+
     /* While enter is pressed, this method is called. */
     actionOnTile()
     {
         if(this.playerTurn == 1)
         {
+            // If cursor isn't on base, check if it's on a unit, if so, display range
+            if(this.isUnitOn())
+            {
+                this.unitSelected();
+            }
             // If enter is pressed while cursor is on base, pop base menu
-            if(this.basePlayer1.getX() == this.cursorPosX && this.basePlayer1.getY() == this.cursorPosY)
+            else if(this.basePlayer1.getX() == this.cursorPosX && this.basePlayer1.getY() == this.cursorPosY)
             {
                 this.baseSelected(this.player1);
             }
+            else
+            {
+                console.log("Nothing to be done here");
+            }
+
+
         }
         if(this.playerTurn == 2)
         {
