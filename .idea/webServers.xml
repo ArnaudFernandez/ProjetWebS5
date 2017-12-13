@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="cbcef507-5d31-4063-b89a-fb9b68f66c0c" name="MiageServ" url="http://sesame-mips.unice.fr">
+        <fileTransfer host="sesame-mips.unice.fr" port="22" privateKey="F:\sshKey\id_rsa" rootFolder="/comptes/f/fa500337" accessType="SFTP" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
