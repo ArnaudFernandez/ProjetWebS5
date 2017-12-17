@@ -18,26 +18,34 @@ class Player
         return this.name;
     }
 
-    setMoney()
-    {
-        this.money += 15;
-    }
-
-    getBase()
-    {
-        return this.base;
-    }
-
     getUnites()
     {
         return this.unites;
     }
 
-    addUnite(uniteId, posX, posY)
-    {
-        let unite = new Unite(uniteId, posX, posY);
 
-        this.unites.push(unite);
+    enoughMoney(couts)
+    {
+        if(this.money - couts >= 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    addUnite(idType,posX,posY)
+    {
+        let unite = new Unite (idType, posX, posY);
+        if(this.enoughMoney(unite.getCost()))
+        {
+            this.unites.push(unite);
+        }
+
+        unite = null;
     }
 
 
