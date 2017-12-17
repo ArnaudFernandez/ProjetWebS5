@@ -18,6 +18,7 @@ class Player
         return this.name;
     }
 
+<<<<<<< Updated upstream
     getUnites()
     {
         return this.unites;
@@ -49,4 +50,6 @@ class Player
     }
 
 
+=======
+>>>>>>> Stashed changes
 }
