@@ -24,6 +24,7 @@ class GameEngine
         this.baseMenuOpen = false;
         this.isUnitSelected = false;
         this.unitesAvaliable = new PoolUnite();
+        this.unitSelected = null;
     }
 
     init()
@@ -57,6 +58,8 @@ class GameEngine
             if(this.playerCreated)
             {
                 this.turnForPlayer(this.player1);
+
+                this.checkGameStatus();
             }
 
             // If menu is open, show menu for current player
@@ -69,9 +72,28 @@ class GameEngine
             }
 
             // Now we draw existings units
-            this.drawUnits()
+            this.drawUnits();
+        }
 
 
+    }
+
+    checkGameStatus() {
+        if (!this.player1.getBase().getStatus()) {
+            context.fillStyle = "rgba(0, 0, 0, 0.5)";
+            context.fillRect(0, 0, this.width, this.height);
+
+            context.fillStyle = "rgba(255, 255, 255, 1)";
+            context.font = "50px roboto";
+            context.fillText( "Player 2 gagne !", this.width / 2 - 50, this.height/2 -25);
+        }
+        if (!this.player2.getBase().getStatus()) {
+            context.fillStyle = "rgba(0, 0, 0, 0.5)";
+            context.fillRect(0, 0, this.width, this.height);
+
+            context.fillStyle = "rgba(255, 255, 255, 1)";
+            context.font = "50px roboto";
+            context.fillText( "Player 1 gagne !", this.width / 2 - 50, this.height/2 -25);
         }
     }
 
@@ -83,15 +105,17 @@ class GameEngine
     escapePressed()
     {
         // Si le menu est fermée, c'est que le joueur veut terminer son tour
-        if(!this.baseMenuOpen) {
+        if(!this.baseMenuOpen && !this.isUnitSelected) {
             if (this.playerTurn == 1) {
+                this.player1.resetAllUnits();
                 this.playerTurn = 2;
-                this.player2.setMoney();
+                this.player2.setMoney(15);
             }
 
             else if (this.playerTurn == 2) {
+                this.player2.resetAllUnits();
                 this.playerTurn = 1;
-                this.player1.setMoney();
+                this.player1.setMoney(15);
             }
             console.log("Player turn : " + this.playerTurn);
         }
@@ -99,6 +123,7 @@ class GameEngine
         if(this.isUnitSelected == true)
         {
             this.isUnitSelected = false;
+            this.unitSelected = null;
             console.log("Unité désélectionné")
         }
 
@@ -137,9 +162,8 @@ class GameEngine
         return false;
     }
 
-    unitSelected()
+    unitSelect()
     {
-        let unitSelected = null;
 
         if(this.playerTurn == 1) {
             for (let i = 0; i < this.player1.getUnites().length; i++) {
@@ -147,7 +171,7 @@ class GameEngine
                 let y = this.player1.getUnites()[i].getY();
 
                 if (this.cursorPosX == x && this.cursorPosY == y) {
-                    unitSelected = this.player1.getUnites()[i];
+                    this.unitSelected = this.player1.getUnites()[i];
                 }
             }
         }
@@ -158,20 +182,12 @@ class GameEngine
                 let y = this.player2.getUnites()[i].getY();
 
                 if (this.cursorPosX == x && this.cursorPosY == y) {
-                    unitSelected = this.player2.getUnites()[i];
+                    this.unitSelected = this.player2.getUnites()[i];
                 }
             }
         }
 
-        if(unitSelected != null)
-        {
-            /* TODO : Show range while the unit is selected. Move is clicked on tile that is on range
-               Attack is performed if clicked on a ennemy that is in range
-            */
 
-            this.isUnitSelected = true;
-            console.log("Unité sélectionné");
-        }
     }
 
     /* While enter is pressed, this method is called. */
@@ -182,30 +198,155 @@ class GameEngine
             // If cursor isn't on base, check if it's on a unit, if so, display range
             if(this.isUnitOn())
             {
-                this.unitSelected();
+                this.unitSelect();
             }
             // If enter is pressed while cursor is on base, pop base menu
             else if(this.basePlayer1.getX() == this.cursorPosX && this.basePlayer1.getY() == this.cursorPosY)
             {
                 this.baseSelected(this.player1);
             }
+            // If player want to move unit !
+            else if(this.unitSelected != false)
+            {
+                this.attackUnit();
+                this.moveUnit();
+            }
             else
             {
                 console.log("Nothing to be done here");
             }
-
-
         }
+
         if(this.playerTurn == 2)
         {
-            if(this.basePlayer2.getX() == this.cursorPosX && this.basePlayer2.getY() == this.cursorPosY)
+            // If cursor isn't on base, check if it's on a unit, if so, display range
+            if(this.isUnitOn())
+            {
+
+                this.unitSelect();
+            }
+            // If enter is pressed while cursor is on base, pop base menu
+            else if(this.basePlayer2.getX() == this.cursorPosX && this.basePlayer2.getY() == this.cursorPosY)
             {
                 this.baseSelected(this.player2);
             }
+            // If player want to move unit !
+            else if(this.unitSelected != false)
+            {
+                this.attackUnit();
+                this.moveUnit();
+            }
+            else
+            {
+                console.log("Nothing to be done here");
+            }
         }
+
         if(this.playerTurn != 1 && this.playerTurn != 2)
         {
             console.log("Player turn is not 1 or 2, so why this message is showing up ?!");
+        }
+    }
+
+    moveUnit()
+    {
+        let distance = 0;
+
+        if(this.cursorPosX <= this.unitSelected.getX())
+        {
+            distance = this.unitSelected.getX() - this.cursorPosX;
+        }
+        if(this.cursorPosX >= this.unitSelected.getX())
+        {
+            distance = this.cursorPosX - this.unitSelected.getX();
+        }
+        if(this.cursorPosY >= this.unitSelected.getY())
+        {
+            distance += this.cursorPosY - this.unitSelected.getY();
+        }
+        if(this.cursorPosY <= this.unitSelected.getY())
+        {
+            distance += this.unitSelected.getY() - this.cursorPosY;
+        }
+
+        console.log("Distance = " + distance);
+
+        if(distance <= this.unitSelected.getWalkRange() && !this.unitSelected.getWalkStatus())
+        {
+            if(!this.isTileOccupied(this.cursorPosX, this.cursorPosY)) {
+                if(this.cursorPosX === this.player1.getBase().getX() && this.cursorPosY === this.player1.getBase().getY())
+                {
+                    console.log("Cannot move on a base");
+                }
+                if(this.cursorPosX === this.player2.getBase().getX() && this.cursorPosY === this.player2.getBase().getY())
+                {
+                    console.log("Cannot move on a base");
+                }
+                else {
+                    this.unitSelected.moveUnit(this.cursorPosX, this.cursorPosY);
+                    this.unitSelected.haveWalked();
+                }
+            }
+        }
+    }
+
+    attackUnit()
+    {
+
+        let tempDistanceAttack = 0;
+        // On regarde d'abord la différence sur l'axe X et on stock dans une variable la différence
+        if(this.unitSelected.getX() <= this.cursorPosX)
+        {
+            tempDistanceAttack = this.cursorPosX - this.unitSelected.getX();
+        }
+        if(this.unitSelected.getX() >= this.cursorPosX)
+        {
+            tempDistanceAttack = this.unitSelected.getX() - this.cursorPosX;
+        }
+        // Puis sur l'axe Y
+        if(this.unitSelected.getY() <= this.cursorPosY)
+        {
+            tempDistanceAttack += this.cursorPosY - this.unitSelected.getY();
+        }
+        if(this.unitSelected.getY() >= this.cursorPosY)
+        {
+            tempDistanceAttack += this.unitSelected.getY() - this.cursorPosY;
+        }
+
+        if(tempDistanceAttack <= this.unitSelected.getAttackRange() && !this.unitSelected.getFireStatus()) {
+
+            if(this.playerTurn === 1  && this.player2.getUnitByPos(this.cursorPosX, this.cursorPosY) != null)
+            {
+                console.log("FIRING");
+                this.player2.getUnitByPos(this.cursorPosX, this.cursorPosY).takingDamage(this.unitSelected.getPower());
+                this.unitSelected.haveFired();
+                this.checkGameStatus();
+            }
+            if(this.playerTurn === 2  && this.player1.getUnitByPos(this.cursorPosX, this.cursorPosY) != null)
+            {
+                console.log("FIRING");
+                this.player1.getUnitByPos(this.cursorPosX, this.cursorPosY).takingDamage(this.unitSelected.getPower());
+                this.unitSelected.haveFired();
+                this.checkGameStatus();
+            }
+
+            //Attack base if is in range
+            if(this.playerTurn === 1 && this.cursorPosX === this.player2.getBase().getX() && this.cursorPosY === this.player2.getBase().getY())
+            {
+                console.log("FIRING");
+                this.basePlayer2.takingDamage(this.unitSelected.getPower());
+                this.unitSelected.haveFired();
+                this.checkGameStatus()
+            }
+            //Attack base if is in range
+            if(this.playerTurn === 2 && this.cursorPosX === this.player1.getBase().getX() && this.cursorPosY === this.player1.getBase().getY())
+            {
+                console.log("FIRING");
+                this.basePlayer1.takingDamage(this.unitSelected.getPower());
+                this.unitSelected.haveFired();
+                this.checkGameStatus();
+            }
+
         }
     }
 
@@ -241,6 +382,7 @@ class GameEngine
                         this.basePlayer1 = new Base(i, j);
                         this.player1 = new Player(this.playerName1, 100, this.basePlayer1);
                     }
+                    console.log(this.basePlayer2);
                 }
             }
         }
@@ -271,8 +413,9 @@ class GameEngine
             {
                 if(this.map[i][j] == 0)
                 {
-                    context.fillStyle = "rgb(66, 244, 95)";
-                    context.fillRect(this.tileSize*i, this.tileSize*j, this.tileSize, this.tileSize);
+                    let img = new Image();
+                    img.src = 'img/grass.png';
+                    context.drawImage(img, this.tileSize*i, this.tileSize*j);
                 }
                 if(this.map[i][j] == 1)
                 {
@@ -281,8 +424,9 @@ class GameEngine
                 }
                 if(this.map[i][j] == 2)
                 {
-                    context.fillStyle = "rgb(173, 173, 173)";
-                    context.fillRect(this.tileSize*i, this.tileSize*j, this.tileSize, this.tileSize);
+                    let img = new Image();
+                    img.src = 'img/mountain.png';
+                    context.drawImage(img, this.tileSize*i, this.tileSize*j);
                 }
                 if(this.map[i][j] == 3)
                 {
@@ -291,14 +435,24 @@ class GameEngine
                 }
                 if(this.map[i][j] == 4)
                 {
-                    context.fillStyle = "rgb(0, 0, 0)";
-                    context.fillRect(this.tileSize*i, this.tileSize*j, this.tileSize, this.tileSize);
+                    if(this.basePlayer1 != null) {
+                        if (this.basePlayer1.getX() === i && this.basePlayer1.getY() === j) {
+                            let img = new Image();
+                            img.src = 'img/baseBlue.png';
+                            context.drawImage(img, this.tileSize * i, this.tileSize * j);
+                        }
+                        if (this.basePlayer2.getX() === i && this.basePlayer2.getY() === j) {
+                            let img = new Image();
+                            img.src = 'img/baseRed.png';
+                            context.drawImage(img, this.tileSize * i, this.tileSize * j);
+                        }
+                    }
                 }
             }
         }
 
         //Now that the map is drawn, we place the cursor
-        if(this.timeToBlink > 30)
+        if(this.timeToBlink > 60)
         {
             this.blinkCursor = !this.blinkCursor;
             this.timeToBlink = 0;
@@ -326,12 +480,43 @@ class GameEngine
 
                 context.save();
 
-                context.fillStyle = "rgb(255, 0, 0)";
-                context.fillRect(this.tileSize * x + 25/2, this.tileSize * y + 25/2, this.tileSize - 25, this.tileSize - 25);
+                let uniteId = this.player1.getUnites()[i].getId();
+                let img = new Image();
 
-                context.fillStyle = "rgba(0,0,0,0.8)";
+                switch(uniteId)
+                {
+                    case 0:
+
+                        img.src = 'img/blueSoldier.png';
+                        context.drawImage(img, this.tileSize * x, this.tileSize * y);
+                        break;
+                    case 1:
+                        img.src = 'img/blueSniper.png';
+                        context.drawImage(img, this.tileSize * x, this.tileSize * y);
+                        break;
+                    case 2:
+                        img.src = 'img/blueJeep.png';
+                        context.drawImage(img, this.tileSize * x, this.tileSize * y);
+                        break;
+                    case 3:
+                        img.src = 'img/blueTank.png';
+                        context.drawImage(img, this.tileSize * x, this.tileSize * y);
+                        break;
+                    default:
+                        context.fillStyle = "rgb(255, 0, 0)";
+                        context.fillRect(this.tileSize * x + 25/2, this.tileSize * y + 25/2, this.tileSize - 25, this.tileSize - 25);
+                        break;
+                }
+
+                context.fillStyle = "rgba(255, 255, 255, 1)";
+                context.font = "13px roboto";
+                context.fillText( "Pv : " + this.player1.getUnites()[i].getHp(), this.tileSize * x +1, this.tileSize * y + this.tileSize);
+                context.fillStyle = "rgba(0,0,0,1)";
                 context.font = "13px roboto";
                 context.fillText( "Pv : " + this.player1.getUnites()[i].getHp(), this.tileSize * x, this.tileSize * y + this.tileSize);
+
+
+
 
                 context.restore();
 
@@ -344,10 +529,37 @@ class GameEngine
 
                 context.save();
 
-                context.fillStyle = "rgb(0, 255, 0)";
-                context.fillRect(this.tileSize * x + 25/2, this.tileSize * y + 25/2, this.tileSize - 25, this.tileSize - 25);
+                let uniteId = this.player2.getUnites()[i].getId();
+                let img = new Image();
 
-                context.fillStyle = "rgba(0,0,0,0.8)";
+                switch(uniteId)
+                {
+                    case 0:
+                        img.src = 'img/redSoldier.png';
+                        context.drawImage(img, this.tileSize * x, this.tileSize * y);
+                        break;
+                    case 1:
+                        img.src = 'img/redSniper.png';
+                        context.drawImage(img, this.tileSize * x, this.tileSize * y);
+                        break;
+                    case 2:
+                        img.src = 'img/redJeep.png';
+                        context.drawImage(img, this.tileSize * x, this.tileSize * y);
+                        break;
+                    case 3:
+                        img.src = 'img/redTank.png';
+                        context.drawImage(img, this.tileSize * x, this.tileSize * y);
+                        break;
+                    default:
+                        context.fillStyle = "rgb(255, 0, 0)";
+                        context.fillRect(this.tileSize * x + 25/2, this.tileSize * y + 25/2, this.tileSize - 25, this.tileSize - 25);
+                        break;
+                }
+
+                context.fillStyle = "rgba(255, 255, 255, 1)";
+                context.font = "13px roboto";
+                context.fillText( "Pv : " + this.player2.getUnites()[i].getHp(), this.tileSize * x +1, this.tileSize * y + this.tileSize);
+                context.fillStyle = "rgba(0,0,0,1)";
                 context.font = "13px roboto";
                 context.fillText( "Pv : " + this.player2.getUnites()[i].getHp(), this.tileSize * x, this.tileSize * y + this.tileSize);
 
@@ -355,6 +567,86 @@ class GameEngine
 
             }
         }
+
+        if(this.player1 != null && this.player2 != null) {
+            context.fillStyle = "rgba(255, 255, 255,0.8)";
+            context.font = "13px roboto";
+            context.fillText("Pv : " + this.player1.getBase().getHp(), this.tileSize * this.player1.getBase().getX(), this.tileSize * this.player1.getBase().getY() + this.tileSize);
+            context.fillText("Pv : " + this.player2.getBase().getHp(), this.tileSize * this.player2.getBase().getX(), this.tileSize * this.player2.getBase().getY() + this.tileSize);
+        }
+
+        if(this.unitSelected != null)
+        {
+
+            this.isUnitSelected = true;
+            console.log("Unité sélectionné");
+
+            let tempDistanceWalk = 0;
+            let tempDistanceAttack = 0;
+
+            // Calcul et dessin de la zone de marche de l'unité sélectionné
+            for(let i = 0; i < this.map.length; i++) {
+                for (let j = 0; j < this.map[i].length; j++) {
+                    tempDistanceWalk = 0;
+                    // On regarde d'abord la différence sur l'axe X et on stock dans une variable la différence
+                    if(this.unitSelected.getX() <= i)
+                    {
+                        tempDistanceWalk = i - this.unitSelected.getX();
+                    }
+                    if(this.unitSelected.getX() >= i)
+                    {
+                        tempDistanceWalk = this.unitSelected.getX() - i;
+                    }
+                    // Puis sur l'axe Y
+                    if(this.unitSelected.getY() <= j)
+                    {
+                        tempDistanceWalk += j - this.unitSelected.getY();
+                    }
+                    if(this.unitSelected.getY() >= j)
+                    {
+                        tempDistanceWalk += this.unitSelected.getY() - j;
+                    }
+
+                    tempDistanceAttack = 0;
+                    // On regarde d'abord la différence sur l'axe X et on stock dans une variable la différence
+                    if(this.unitSelected.getX() <= i)
+                    {
+                        tempDistanceAttack = i - this.unitSelected.getX();
+                    }
+                    if(this.unitSelected.getX() >= i)
+                    {
+                        tempDistanceAttack = this.unitSelected.getX() - i;
+                    }
+                    // Puis sur l'axe Y
+                    if(this.unitSelected.getY() <= j)
+                    {
+                        tempDistanceAttack += j - this.unitSelected.getY();
+                    }
+                    if(this.unitSelected.getY() >= j)
+                    {
+                        tempDistanceAttack += this.unitSelected.getY() - j;
+                    }
+
+                    // Maintenant, on doit dessiner pour le joueur les cases à porté !
+                    if(tempDistanceWalk <= this.unitSelected.getWalkRange() && !this.unitSelected.getWalkStatus()) {
+                        context.fillStyle = "rgba(66, 167, 244, 0.6)";
+                        context.fillRect(this.tileSize * i, this.tileSize * j, this.tileSize, this.tileSize);
+                    }
+
+                    // Maintenant, on doit dessiner pour le joueur les cases à porté !
+                    if(tempDistanceAttack <= this.unitSelected.getAttackRange() && !this.unitSelected.getFireStatus()) {
+                        if(!this.blinkCursor)
+                        {
+                            context.fillStyle = "rgba(255, 48, 48, 0.4)";
+                            context.fillRect(this.tileSize * i, this.tileSize * j, this.tileSize, this.tileSize);
+                        }
+
+                    }
+                }
+            }
+        }
+
+
     }
 
 
@@ -485,7 +777,14 @@ class GameEngine
                     console.log("Tile is occupied : Buy canceled");
                 }
                 else {
-                    this.player1.addUnite(uniteId, this.player1.getBase().getX(), this.player1.getBase().getY());
+                    if(this.player1.enoughMoney(this.unitesAvaliable.getPriceById(uniteId))) {
+                        this.player1.addUnite(uniteId, this.player1.getBase().getX(), this.player1.getBase().getY());
+                        this.player1.setMoney(-this.unitesAvaliable.getPriceById(uniteId))
+                    }
+                    else
+                    {
+                        console.log("Not enough money !")
+                    }
                 }
             }
             if(this.playerTurn == 2)
@@ -495,7 +794,10 @@ class GameEngine
                     console.log("Tile is occupied : Buy canceled");
                 }
                 else {
-                    this.player2.addUnite(uniteId, this.player2.getBase().getX(), this.player2.getBase().getY());
+                    if(this.player2.enoughMoney(this.unitesAvaliable.getPriceById(uniteId))) {
+                        this.player2.addUnite(uniteId, this.player2.getBase().getX(), this.player2.getBase().getY());
+                        this.player2.setMoney(-this.unitesAvaliable.getPriceById(uniteId))
+                    }
                 }
             }
 

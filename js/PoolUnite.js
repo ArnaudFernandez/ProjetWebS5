@@ -27,4 +27,9 @@ class PoolUnite
     {
         return this.unites[id].getName();
     }
+
+    getPriceById(id)
+    {
+        return this.unites[id].getCost();
+    }
 }

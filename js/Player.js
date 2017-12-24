@@ -18,7 +18,6 @@ class Player
         return this.name;
     }
 
-<<<<<<< Updated upstream
     getUnites()
     {
         return this.unites;
@@ -37,6 +36,21 @@ class Player
         }
     }
 
+    getUnitByPos(x, y)
+    {
+        for(let i = 0; i < this.unites.length; i++)
+        {
+            if(this.unites[i].getX() ===  x)
+            {
+                if(this.unites[i].getY() ===  y) {
+                    console.log(this.unites[i]);
+                    return this.unites[i];
+                }
+            }
+        }
+
+        return null;
+    }
 
     addUnite(idType,posX,posY)
     {
@@ -50,6 +64,23 @@ class Player
     }
 
 
-=======
->>>>>>> Stashed changes
+    getBase()
+    {
+        return this.base;
+    }
+
+    setMoney(money)
+    {
+        this.money += money;
+    }
+
+    resetAllUnits()
+    {
+        for(let i = 0; i < this.unites.length; i++)
+        {
+            this.unites[i].resetStatus();
+        }
+    }
+
+
 }

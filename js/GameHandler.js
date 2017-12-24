@@ -30,12 +30,10 @@ function draw()
 
     context.clearRect(0,0, canvas.width, canvas.height);
 
-    // Draw the map
-<<<<<<< Updated upstream
-    game.gameLoop();
-=======
     game.buildMap();
->>>>>>> Stashed changes
+
+    // Draw the map
+    game.gameLoop();
 
     context.restore();
 

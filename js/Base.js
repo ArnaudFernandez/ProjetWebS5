@@ -7,18 +7,6 @@ class Base
         this.healthPoint = 100;
     }
 
-    getBaseState()
-    {
-        if(this.healthPoint > 0)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     getX()
     {
         return this.posX;
@@ -29,4 +17,22 @@ class Base
         return this.posY;
     }
 
+    getHp()
+    {
+        return this.healthPoint;
+    }
+
+    takingDamage(damage)
+    {
+        this.healthPoint -= damage;
+    }
+
+    getStatus()
+    {
+        if(this.healthPoint <= 0)
+        {
+            return false;
+        }
+        return true;
+    }
 }

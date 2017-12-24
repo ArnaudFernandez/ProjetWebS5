@@ -2,26 +2,3 @@ html, body
 {
     margin : 0;
 }
-
-canvas
-{
-    z-index: -1;
-    position: absolute;
-}
-
-.mainMenu
-{
-    z-index: 99;
-    width : 50%;
-    height : 150px;
-    background-color: rgba(239, 239, 239, 1);
-    margin: auto;
-    border-radius: 0px 0px 9px 9px;
-    border-bottom: solid 2px rgb(204, 204, 204);
-}
-
-.title
-{
-    text-align: center;
-    font-size: 1.5em;
-}

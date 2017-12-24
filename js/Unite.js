@@ -9,9 +9,12 @@ class Unite
     * */
     constructor(idType, posX, posY)
     {
+        this.walked = false;
+        this.fired = false;
         switch(idType)
         {
             case 0:
+                this.id = 0;
                 this.name = "Infantrie";
                 this.hp = 20;
                 this.power = 5;
@@ -20,6 +23,7 @@ class Unite
                 this.attackRange = 1;
                 break;
             case 1:
+                this.id = 1;
                 this.name = "Sniper";
                 this.hp = 10;
                 this.power = 10;
@@ -28,6 +32,7 @@ class Unite
                 this.attackRange = 4;
                 break;
             case 2:
+                this.id = 2;
                 this.name = "Jeep d'attaque";
                 this.hp = 50;
                 this.power = 15;
@@ -36,6 +41,7 @@ class Unite
                 this.attackRange = 1;
                 break;
             case 3:
+                this.id = 3;
                 this.name = "Tank";
                 this.hp = 130;
                 this.power = 30;
@@ -44,6 +50,7 @@ class Unite
                 this.attackRange = 1;
                 break;
             default:
+                this.id = 99;
                 this.name = "Default";
                 this.hp = 0;
                 this.power = 0;
@@ -54,6 +61,11 @@ class Unite
         }
         this.posX = posX;
         this.posY = posY;
+    }
+
+    getId()
+    {
+        return this.id;
     }
 
     getName()
@@ -101,6 +113,32 @@ class Unite
         return this.posY;
     }
 
+    getWalkStatus()
+    {
+        return this.walked;
+    }
+
+    getFireStatus()
+    {
+        return this.fired;
+    }
+
+    haveFired()
+    {
+        this.fired = true;
+    }
+
+    haveWalked()
+    {
+        this.walked = true;
+    }
+
+    resetStatus()
+    {
+        this.fired = false;
+        this.walked = false;
+    }
+
     isItAlive()
     {
         if(this.hp <= 0)
@@ -114,5 +152,12 @@ class Unite
     {
         unitTargeted.hp -= this.power;
     }
+
+    moveUnit(x, y)
+    {
+        this.posX = x;
+        this.posY = y;
+    }
+
 
 }
